@@ -1,4 +1,4 @@
- const canvas = document.getElementById('mazeCanvas');
+const canvas = document.getElementById('mazeCanvas');
 const ctx = canvas.getContext('2d');
 const timerElement = document.getElementById('timer');
 const statusElement = document.getElementById('status');
@@ -32,52 +32,7 @@ class Cell {
     }
 }
 
-// 1. GENERAZIONE LABIRINTO (con Vie Alternative e Scorciatoie)
-function generateMaze() {
-    grid = [];
-    for (let r = 0; r < rows; r++) {
-        let row = [];
-        for (let c = 0; c < cols; c++) {
-            row.push(new Cell(r, c));
-        }
-        grid.push(row);
-    }
-
-    let stack = [];
-    let current = grid[0][0];
-    current.visited = true;
-
-    // FASE A: Generazione base (Recursive Backtracker)
-    do {
-        let next = getUnvisitedNeighbor(current);
-        if (next) {
-            next.visited = true;
-            stack.push(current);
-            removeWalls(current, next);
-            current = next;
-        } else if (stack.length > 0) {
-            current = stack.pop();
-        }
-    } while (stack.length > 0);
-
-    // FASE B: Creazione di percorsi alternativi (Abbattimento muri extra)
-    let extraPaths = Math.floor((rows * cols) * 0.15); // Rimuove ~15% dei muri interni
-    
-    for (let i = 0; i < extraPaths; i++) {
-        let randomRow = Math.floor(Math.random() * (rows - 2)) + 1;
-        let randomCol = Math.floor(Math.random() * (cols - 2)) + 1;
-        let cellA = grid[randomRow][randomCol];
-
-        if (Math.random() > 0.5 && randomRow < rows - 1) {
-            let cellB = grid[randomRow + 1][randomCol];
-            removeWalls(cellA, cellB);
-        } else if (randomCol < cols - 1) {
-            let cellB = grid[randomRow][randomCol + 1];
-            removeWalls(cellA, cellB);
-        }
-    }
-}
-
+// 1. FUNZIONI DI SUPPORTO PER IL LABIRINTO
 function getUnvisitedNeighbor(cell) {
     let neighbors = [];
     let { r, c } = cell;
@@ -104,7 +59,53 @@ function removeWalls(a, b) {
     else if (y === -1) { a.walls[2] = false; b.walls[0] = false; }
 }
 
-// 2. PATHFINDING NEMICO (BFS per percorso più breve)
+// 2. GENERAZIONE LABIRINTO (con Vie Alternative)
+function generateMaze() {
+    grid = [];
+    for (let r = 0; r < rows; r++) {
+        let row = [];
+        for (let c = 0; c < cols; c++) {
+            row.push(new Cell(r, c));
+        }
+        grid.push(row);
+    }
+
+    let stack = [];
+    let current = grid[0][0];
+    current.visited = true;
+
+    // FASE A: Algoritmo base
+    do {
+        let next = getUnvisitedNeighbor(current);
+        if (next) {
+            next.visited = true;
+            stack.push(current);
+            removeWalls(current, next);
+            current = next;
+        } else if (stack.length > 0) {
+            current = stack.pop();
+        }
+    } while (stack.length > 0);
+
+    // FASE B: Percorsi alternativi (~15% di muri rimossi)
+    let extraPaths = Math.floor((rows * cols) * 0.15);
+    
+    for (let i = 0; i < extraPaths; i++) {
+        let randomRow = Math.floor(Math.random() * (rows - 2)) + 1;
+        let randomCol = Math.floor(Math.random() * (cols - 2)) + 1;
+        let cellA = grid[randomRow][randomCol];
+
+        if (Math.random() > 0.5 && randomRow < rows - 1) {
+            let cellB = grid[randomRow + 1][randomCol];
+            removeWalls(cellA, cellB);
+        } else if (randomCol < cols - 1) {
+            let cellB = grid[randomRow][randomCol + 1];
+            removeWalls(cellA, cellB);
+        }
+    }
+}
+
+// 3. PATHFINDING NEMICO (BFS)
 function getPathToPlayer() {
     let queue = [[ { x: enemy.x, y: enemy.y } ]];
     let visited = Array.from({ length: rows }, () => Array(cols).fill(false));
@@ -145,7 +146,6 @@ function moveEnemy() {
     if (gameOver) return;
 
     let path = getPathToPlayer();
-    // Il nemico avanza inseguendo lungo il percorso calcolato
     let stepsToMove = Math.floor((path.length - 1) / 2);
 
     if (stepsToMove > 0 && path[1]) {
@@ -157,7 +157,7 @@ function moveEnemy() {
     draw();
 }
 
-// 3. LOGICA GIOCATORE E CONTROLLI
+// 4. MOVIMENTO GIOCATORE
 function movePlayer(dir) {
     if (gameOver) return;
 
@@ -178,7 +178,7 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') movePlayer('LEFT');
 });
 
-// 4. VERIFICA VITTORIA / SCONFITTA
+// 5. CONTROLLO COLLISIONI E VITTORIA
 function checkCollision() {
     if (player.x === enemy.x && player.y === enemy.y) {
         endGame("CATTURATO! Il nemico ti ha preso.", "#ff2e63");
@@ -195,11 +195,10 @@ function endGame(message, color) {
     clearInterval(gameLoopInterval);
 }
 
-// 5. RENDERING GRAFICO
+// 6. GRAFICA E DISEGNO
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Disegna Muri Labirinto
     ctx.strokeStyle = "#ffffff";
     ctx.lineWidth = 2;
 
@@ -216,17 +215,17 @@ function draw() {
         }
     }
 
-    // Disegna Arrivo (Verde)
+    // Uscita Verde
     ctx.fillStyle = "#00adb5";
     ctx.fillRect(goal.x * cellSize + 4, goal.y * cellSize + 4, cellSize - 8, cellSize - 8);
 
-    // Disegna Nemico (Rosso)
+    // Nemico Rosso
     ctx.fillStyle = "#ff2e63";
     ctx.beginPath();
     ctx.arc(enemy.x * cellSize + cellSize / 2, enemy.y * cellSize + cellSize / 2, cellSize / 3, 0, Math.PI * 2);
     ctx.fill();
 
-    // Disegna Giocatore (Giallo)
+    // Giocatore Giallo
     ctx.fillStyle = "#f9ed69";
     ctx.beginPath();
     ctx.arc(player.x * cellSize + cellSize / 2, player.y * cellSize + cellSize / 2, cellSize / 3, 0, Math.PI * 2);
@@ -240,7 +239,7 @@ function drawLine(x1, y1, x2, y2) {
     ctx.stroke();
 }
 
-// 6. GESTIONE TIMER E CAMBIO LABIRINTO (80s)
+// 7. TIMER 80 SECONDI
 function startTimer() {
     timeLeft = 80;
     timerElement.innerText = timeLeft;
@@ -261,7 +260,7 @@ function startTimer() {
     }, 1000);
 }
 
-// INIZIALIZZAZIONE GIOCO
+// 8. AVVIO DEL GIOCO
 function init() {
     generateMaze();
     player = { x: 0, y: 0 };
@@ -270,7 +269,6 @@ function init() {
     gameOver = false;
 
     startTimer();
-    // Il nemico si muove ogni 600 ms
     gameLoopInterval = setInterval(moveEnemy, 600);
     draw();
 }
