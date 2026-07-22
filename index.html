@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Labirinto Dinamico</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>Fuga dal Labirinto</h1>
+        
+        <div class="hud">
+            <div class="info">Timer Cambio: <span id="timer">80</span>s</div>
+            <div class="info" id="status">Raggiungi l'uscita verde!</div>
+        </div>
+
+        <canvas id="mazeCanvas"></canvas>
+
+        <p class="controls-hint">Usa le **Frecce Direzionali** o **WASD** per muoverti.</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
