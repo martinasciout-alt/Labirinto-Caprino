@@ -1,4 +1,4 @@
-const canvas = document.getElementById('mazeCanvas');
+ const canvas = document.getElementById('mazeCanvas');
 const ctx = canvas.getContext('2d');
 const timerElement = document.getElementById('timer');
 const statusElement = document.getElementById('status');
@@ -32,9 +32,7 @@ class Cell {
     }
 }
 
-
-
-// 1. GENERAZIONE LABIRINTO (con Vie Alternative)
+// 1. GENERAZIONE LABIRINTO (con Vie Alternative e Scorciatoie)
 function generateMaze() {
     grid = [];
     for (let r = 0; r < rows; r++) {
@@ -49,7 +47,7 @@ function generateMaze() {
     let current = grid[0][0];
     current.visited = true;
 
-    // Generazione base con Recursive Backtracker
+    // FASE A: Generazione base (Recursive Backtracker)
     do {
         let next = getUnvisitedNeighbor(current);
         if (next) {
@@ -62,16 +60,14 @@ function generateMaze() {
         }
     } while (stack.length > 0);
 
-    // --- NUOVA LOGICA: CREAZIONE DI PERCORSI ALTERNATIVI ---
-    // Rimuoviamo casualmente circa il 15% dei muri interni rimasti
-    let extraPaths = Math.floor((rows * cols) * 0.15); 
+    // FASE B: Creazione di percorsi alternativi (Abbattimento muri extra)
+    let extraPaths = Math.floor((rows * cols) * 0.15); // Rimuove ~15% dei muri interni
     
     for (let i = 0; i < extraPaths; i++) {
         let randomRow = Math.floor(Math.random() * (rows - 2)) + 1;
         let randomCol = Math.floor(Math.random() * (cols - 2)) + 1;
         let cellA = grid[randomRow][randomCol];
 
-        // Scegliamo un vicino a caso tra Sud o Est per aprire un varco
         if (Math.random() > 0.5 && randomRow < rows - 1) {
             let cellB = grid[randomRow + 1][randomCol];
             removeWalls(cellA, cellB);
@@ -80,6 +76,32 @@ function generateMaze() {
             removeWalls(cellA, cellB);
         }
     }
+}
+
+function getUnvisitedNeighbor(cell) {
+    let neighbors = [];
+    let { r, c } = cell;
+
+    if (r > 0 && !grid[r - 1][c].visited) neighbors.push(grid[r - 1][c]);
+    if (c < cols - 1 && !grid[r][c + 1].visited) neighbors.push(grid[r][c + 1]);
+    if (r < rows - 1 && !grid[r + 1][c].visited) neighbors.push(grid[r + 1][c]);
+    if (c > 0 && !grid[r][c - 1].visited) neighbors.push(grid[r][c - 1]);
+
+    if (neighbors.length > 0) {
+        let randIndex = Math.floor(Math.random() * neighbors.length);
+        return neighbors[randIndex];
+    }
+    return undefined;
+}
+
+function removeWalls(a, b) {
+    let x = a.c - b.c;
+    if (x === 1) { a.walls[3] = false; b.walls[1] = false; }
+    else if (x === -1) { a.walls[1] = false; b.walls[3] = false; }
+
+    let y = a.r - b.r;
+    if (y === 1) { a.walls[0] = false; b.walls[2] = false; }
+    else if (y === -1) { a.walls[2] = false; b.walls[0] = false; }
 }
 
 // 2. PATHFINDING NEMICO (BFS per percorso più breve)
@@ -123,7 +145,7 @@ function moveEnemy() {
     if (gameOver) return;
 
     let path = getPathToPlayer();
-    // Il nemico percorre solo METÀ del percorso calcolato verso il giocatore
+    // Il nemico avanza inseguendo lungo il percorso calcolato
     let stepsToMove = Math.floor((path.length - 1) / 2);
 
     if (stepsToMove > 0 && path[1]) {
@@ -132,6 +154,7 @@ function moveEnemy() {
     }
 
     checkCollision();
+    draw();
 }
 
 // 3. LOGICA GIOCATORE E CONTROLLI
@@ -227,7 +250,6 @@ function startTimer() {
         timerElement.innerText = timeLeft;
 
         if (timeLeft <= 0) {
-            // Rigenera il labirinto ogni 80 secondi
             generateMaze();
             timeLeft = 80;
             statusElement.innerText = "IL LABIRINTO È CAMBIATO!";
@@ -248,7 +270,7 @@ function init() {
     gameOver = false;
 
     startTimer();
-    // Il nemico fa un passo ogni 600ms (inseguendo per metà percorso)
+    // Il nemico si muove ogni 600 ms
     gameLoopInterval = setInterval(moveEnemy, 600);
     draw();
 }
