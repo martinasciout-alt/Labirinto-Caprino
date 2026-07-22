@@ -32,7 +32,9 @@ class Cell {
     }
 }
 
-// 1. GENERAZIONE LABIRINTO (Recursive Backtracker)
+
+
+// 1. GENERAZIONE LABIRINTO (con Vie Alternative)
 function generateMaze() {
     grid = [];
     for (let r = 0; r < rows; r++) {
@@ -47,6 +49,7 @@ function generateMaze() {
     let current = grid[0][0];
     current.visited = true;
 
+    // Generazione base con Recursive Backtracker
     do {
         let next = getUnvisitedNeighbor(current);
         if (next) {
@@ -58,32 +61,25 @@ function generateMaze() {
             current = stack.pop();
         }
     } while (stack.length > 0);
-}
 
-function getUnvisitedNeighbor(cell) {
-    let neighbors = [];
-    let { r, c } = cell;
+    // --- NUOVA LOGICA: CREAZIONE DI PERCORSI ALTERNATIVI ---
+    // Rimuoviamo casualmente circa il 15% dei muri interni rimasti
+    let extraPaths = Math.floor((rows * cols) * 0.15); 
+    
+    for (let i = 0; i < extraPaths; i++) {
+        let randomRow = Math.floor(Math.random() * (rows - 2)) + 1;
+        let randomCol = Math.floor(Math.random() * (cols - 2)) + 1;
+        let cellA = grid[randomRow][randomCol];
 
-    if (r > 0 && !grid[r - 1][c].visited) neighbors.push(grid[r - 1][c]);
-    if (c < cols - 1 && !grid[r][c + 1].visited) neighbors.push(grid[r][c + 1]);
-    if (r < rows - 1 && !grid[r + 1][c].visited) neighbors.push(grid[r + 1][c]);
-    if (c > 0 && !grid[r][c - 1].visited) neighbors.push(grid[r][c - 1]);
-
-    if (neighbors.length > 0) {
-        let randIndex = Math.floor(Math.random() * neighbors.length);
-        return neighbors[randIndex];
+        // Scegliamo un vicino a caso tra Sud o Est per aprire un varco
+        if (Math.random() > 0.5 && randomRow < rows - 1) {
+            let cellB = grid[randomRow + 1][randomCol];
+            removeWalls(cellA, cellB);
+        } else if (randomCol < cols - 1) {
+            let cellB = grid[randomRow][randomCol + 1];
+            removeWalls(cellA, cellB);
+        }
     }
-    return undefined;
-}
-
-function removeWalls(a, b) {
-    let x = a.c - b.c;
-    if (x === 1) { a.walls[3] = false; b.walls[1] = false; }
-    else if (x === -1) { a.walls[1] = false; b.walls[3] = false; }
-
-    let y = a.r - b.r;
-    if (y === 1) { a.walls[0] = false; b.walls[2] = false; }
-    else if (y === -1) { a.walls[2] = false; b.walls[0] = false; }
 }
 
 // 2. PATHFINDING NEMICO (BFS per percorso più breve)
