@@ -1,12 +1,11 @@
-/* 1. CARICAMENTO DEL TUO FONT LOCALE */
+ 
 @font-face {
     font-family: 'MatchaCih';
     src: url('Matcha Cih.otf') format('opentype'); 
-    /* NOTA: Se nella cartella hai il file .ttf invece di .otf, 
-       cambia l'estensione sopra in 'Matcha Cih.ttf' e 'truetype' */
+    
 }
 
-/* 2. RESET E IMPOSTAZIONI DI BASE */
+ 
 * {
     box-sizing: border-box;
     margin: 0;
@@ -16,7 +15,7 @@
 body {
     background-color: #1a1a2e;
     color: #ffffff;
-    /* Applicazione del tuo font personalizzato a tutto il gioco */
+  
     font-family: 'MatchaCih', sans-serif; 
     display: flex;
     justify-content: center;
@@ -40,7 +39,7 @@ h1 {
     color: #e94560;
 }
 
-/* 3. LAYOUT DELL'HUD (Frase sopra, Tempo sotto al centro) */
+ 
 .hud {
     display: flex;
     flex-direction: column; 
