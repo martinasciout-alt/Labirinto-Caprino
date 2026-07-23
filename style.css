@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'MatchaCih';
-    src: url('Matcha Cih.otf') format('opentype'); 
+    src: url('Matcha Cih.otf') format('opentype');
 }
 
 * {
@@ -12,7 +12,7 @@
 body {
     background-color: #2b1e16; /* Sfondo pagina: Marrone Legno Scuro */
     color: #f4eae1;            /* Testo principale: Sabbia/Beige chiaro */
-    font-family: 'MatchaCih', sans-serif; 
+    font-family: 'MatchaCih', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -40,9 +40,9 @@ h1 {
 /* Informazioni HUD */
 .hud {
     display: flex;
-    flex-direction: column; 
-    align-items: center;    
-    gap: 10px;               
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
     margin-bottom: 15px;
     color: #c2d4b2;            /* Verde Salvia Chiaro */
 }
@@ -58,7 +58,7 @@ h1 {
 
 /* Numero del Timer */
 #timer {
-    color: #f1c40f;            /* Giallo Miele spicco */
+    color: #f1c40f;            /* Giallo Miele */
     font-size: 1.4rem;
 }
 
