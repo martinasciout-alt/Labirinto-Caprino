@@ -15,9 +15,9 @@ body {
 
 .hud {
     display: flex;
-    flex-direction: column; /* Dispone in colonna */
-    align-items: center;    /* Centra orizzontalmente */
-    gap: 8px;               /* Spazio tra la frase e il tempo */
+    flex-direction: column;
+    align-items: center;    
+    gap: 8px;               
     margin-bottom: 15px;
 }
 
