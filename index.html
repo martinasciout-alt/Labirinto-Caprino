@@ -5,19 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Labirinto Caprino</title>
     <link rel="icon" type="image/png" href="favicon.webp">
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
     <div class="game-container">
         <h1>Labirinto caprino</h1>
         
-        <!-- HUD Modificato: Frase sopra, Tempo sotto -->
         <div class="hud">
             <div class="info" id="status">Arriva all'uscita prima di essere raggiunto!</div>
             <div class="info" id="timer-box">Tempo: <span id="timer">80</span>s</div>
         </div>
 
-        <canvas id="mazeCanvas"></canvas>
+        <div class="canvas-wrapper">
+            <canvas id="mazeCanvas"></canvas>
+            
+            <!-- SCHERMATA DI FINE GIOCO -->
+            <div id="game-over-overlay" class="hidden">
+                <button id="restart-btn" onclick="init()"> Gioca Ancora</button>
+                <img id="end-game-img" src="" alt="Risultato">
+            </div>
+        </div>
 
         <p class="controls-hint">Usa le Frecce o WASD per muoverti.</p>
     </div>
