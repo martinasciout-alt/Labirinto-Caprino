@@ -5,6 +5,14 @@ const statusElement = document.getElementById('status');
 const overlay = document.getElementById('game-over-overlay');
 const endGameImg = document.getElementById('end-game-img');
 
+// CARICAMENTO AUDIO
+const audioVittoria = new Audio('vittoria.wav');
+const audioSconfitta = new Audio('sconfitta.mp3');
+
+// Opzionale: Regola il volume (da 0.0 a 1.0)
+audioVittoria.volume = 0.7;
+audioSconfitta.volume = 0.7;
+
 // Parametri Griglia
 const rows = 15;
 const cols = 15;
@@ -235,19 +243,28 @@ document.addEventListener('keydown', (e) => {
 // 5. CONTROLLO COLLISIONI E VITTORIA
 function checkCollision() {
     if (player.x === enemy.x && player.y === enemy.y) {
-        endGame("CATTURATO! Il nemico ti ha preso.", "#e67e22", "hai perso.webp");
+        endGame("CATTURATO! Il nemico ti ha preso.", "#e67e22", "hai perso.webp", false);
     } else if (player.x === goal.x && player.y === goal.y) {
-        endGame("VITTORIA! Sei fuggito dal labirinto!", "#8fa87a", "hai vinto.webp");
+        endGame("VITTORIA! Sei fuggito dal labirinto!", "#8fa87a", "hai vinto.webp", true);
     }
 }
 
-function endGame(message, color, imgSource) {
+function endGame(message, color, imgSource, isWin) {
     gameOver = true;
     statusElement.innerText = message;
     statusElement.style.color = color;
     
     endGameImg.src = imgSource;
     overlay.classList.remove('hidden');
+
+    // Riproduzione Audio
+    if (isWin) {
+        audioVittoria.currentTime = 0;
+        audioVittoria.play();
+    } else {
+        audioSconfitta.currentTime = 0;
+        audioSconfitta.play();
+    }
 
     clearInterval(timerInterval);
     clearInterval(gameLoopInterval);
@@ -376,6 +393,12 @@ function startTimer() {
 
 // 8. AVVIO / RESTART DEL GIOCO
 function init() {
+    // Interrompi eventuali audio ancora in corso
+    audioVittoria.pause();
+    audioVittoria.currentTime = 0;
+    audioSconfitta.pause();
+    audioSconfitta.currentTime = 0;
+
     overlay.classList.add('hidden');
     statusElement.innerText = "Arriva all'uscita prima di essere raggiunto!";
     statusElement.style.color = "#c2d4b2";
@@ -395,5 +418,8 @@ function init() {
     gameLoopInterval = setInterval(moveEnemy, 600);
     draw();
 }
+
+// Associa il pulsante di restart
+document.getElementById('restart-btn').addEventListener('click', init);
 
 init();
