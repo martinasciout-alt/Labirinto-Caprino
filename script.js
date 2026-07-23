@@ -7,7 +7,7 @@ const startOverlay = document.getElementById('start-overlay');
 const startBtn = document.getElementById('start-btn');
 const endGameImg = document.getElementById('end-game-img');
 
-// CARICAMENTO AUDIO
+//AUDIO
 const audioVittoria = new Audio('vittoria.wav');
 const audioSconfitta = new Audio('sconfitta.mp3');
 const audioSottofondo = new Audio('sottofondo.wav');
@@ -17,7 +17,7 @@ audioSconfitta.volume = 0.7;
 audioSottofondo.volume = 0.5;
 audioSottofondo.loop = true;
 
-// Parametri Griglia
+//Griglia
 const rows = 15;
 const cols = 15;
 const cellSize = 30; // Dimensione cella in pixel
@@ -25,7 +25,7 @@ const cellSize = 30; // Dimensione cella in pixel
 canvas.width = cols * cellSize;
 canvas.height = rows * cellSize;
 
-// CARICAMENTO IMMAGINI
+//IMMAGINI
 let goalLoaded = false;
 const imgGoal = new Image();
 imgGoal.src = 'arrivo.png';
@@ -76,7 +76,7 @@ class Cell {
     }
 }
 
-// 1. FUNZIONI LABIRINTO
+// 1. LABIRINTO
 function getUnvisitedNeighbor(cell) {
     let neighbors = [];
     let { r, c } = cell;
@@ -103,7 +103,7 @@ function removeWalls(a, b) {
     else if (y === -1) { a.walls[2] = false; b.walls[0] = false; }
 }
 
-// 2. GENERAZIONE LABIRINTO
+// 2. GENERAZIONE
 function generateMaze() {
     grid = [];
     for (let r = 0; r < rows; r++) {
@@ -146,7 +146,7 @@ function generateMaze() {
     }
 }
 
-// 3. PATHFINDING NEMICO
+// 3.NEMICO
 function getPathToPlayer() {
     let queue = [[ { x: enemy.x, y: enemy.y } ]];
     let visited = Array.from({ length: rows }, () => Array(cols).fill(false));
@@ -192,10 +192,10 @@ function moveEnemy() {
         let nextX = path[1].x;
         let nextY = path[1].y;
 
-        if (nextX > enemy.x) enemyAngle = Math.PI * 0.5;       // Va a Destra
-        else if (nextX < enemy.x) enemyAngle = Math.PI * 1.5;  // Va a Sinistra
-        else if (nextY > enemy.y) enemyAngle = Math.PI * 1.0;  // Va in Basso
-        else if (nextY < enemy.y) enemyAngle = Math.PI * 2.0;  // Va in Alto 
+        if (nextX > enemy.x) enemyAngle = Math.PI * 0.5;       //Destra
+        else if (nextX < enemy.x) enemyAngle = Math.PI * 1.5;  //Sinistra
+        else if (nextY > enemy.y) enemyAngle = Math.PI * 1.0;  //Basso
+        else if (nextY < enemy.y) enemyAngle = Math.PI * 2.0;  //Alto 
 
         enemy.x = nextX;
         enemy.y = nextY;
@@ -205,7 +205,7 @@ function moveEnemy() {
     draw();
 }
 
-// 4. MOVIMENTO GIOCATORE CON ROTOLAMENTO
+// 4. MOVIMENTO GIOCATORE
 function movePlayer(dir) {
     if (gameOver) return;
 
@@ -244,7 +244,7 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') movePlayer('LEFT');
 });
 
-// CONTROLLI TOUCH DIREZIONALI
+// CONTROLLI TOUCH
 function addTouchControls() {
     const bindBtn = (id, dir) => {
         const btn = document.getElementById(id);
@@ -264,10 +264,10 @@ function addTouchControls() {
 }
 addTouchControls();
 
-// 5. CONTROLLO COLLISIONI E VITTORIA
+// 5.COLLISIONI E VITTORIA
 function checkCollision() {
     if (player.x === enemy.x && player.y === enemy.y) {
-        endGame("CATTURATO! Il nemico ti ha preso.", "#e67e22", "hai perso.webp", false);
+        endGame("CATTURATO! La capra ti ha mangiato.", "#e67e22", "hai perso.webp", false);
     } else if (player.x === goal.x && player.y === goal.y) {
         endGame("VITTORIA! Sei fuggito dal labirinto!", "#8fa87a", "hai vinto.webp", true);
     }
@@ -297,7 +297,7 @@ function endGame(message, color, imgSource, isWin) {
     clearInterval(gameLoopInterval);
 }
 
-// 6. GRAFICA E DISEGNO
+// 6. GRAFICA
 function draw() {
     // SFONDO
     for (let r = 0; r < rows; r++) {
@@ -420,7 +420,7 @@ function startTimer() {
 
 // 8. AVVIO / RESTART DEL GIOCO
 function init() {
-    // Interrompi audio di vittoria o sconfitta
+    
     audioVittoria.pause();
     audioVittoria.currentTime = 0;
     audioSconfitta.pause();
@@ -450,7 +450,6 @@ function init() {
     }
 }
 
-// Funzione chiamata al click su "Inizia partita" nel popup di avvio
 function startGame() {
     startOverlay.classList.add('hidden');
     gameOver = false;
@@ -463,9 +462,7 @@ function startGame() {
     gameLoopInterval = setInterval(moveEnemy, 600);
 }
 
-// Event Listeners
 startBtn.addEventListener('click', startGame);
 document.getElementById('restart-btn').addEventListener('click', init);
 
-// Genera il labirinto iniziale da mostrare dietro al popup
 init();
