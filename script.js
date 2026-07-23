@@ -44,7 +44,7 @@ let player = { x: 0, y: 0 };
 let playerAngle = 0; // Rotazione progressiva per "rotolare"
 
 let enemy = { x: cols - 1, y: rows - 1 };
-let enemyAngle = 0; 
+let enemyAngle = Math.PI; // Inizializzato per puntare verso l'alto
 
 let goal = { x: cols - 1, y: rows - 1 };
 
@@ -179,11 +179,11 @@ function moveEnemy() {
         let nextX = path[1].x;
         let nextY = path[1].y;
 
-        // Impostiamo l'angolo di movimento naturale (0 = Destra, PI/2 = Basso, PI = Sinistra, 3*PI/2 = Alto)
-        if (nextX > enemy.x) enemyAngle = 0;                   // Destra
-        else if (nextX < enemy.x) enemyAngle = Math.PI;        // Sinistra
-        else if (nextY > enemy.y) enemyAngle = Math.PI * 0.5;  // Basso
-        else if (nextY < enemy.y) enemyAngle = Math.PI * 1.5;  // Alto
+        // ANGOLI RUOTATI DI 90° PER ALLINEARE LA TESTA
+        if (nextX > enemy.x) enemyAngle = Math.PI * 0.5;       // Va a Destra
+        else if (nextX < enemy.x) enemyAngle = Math.PI * 1.5;  // Va a Sinistra
+        else if (nextY > enemy.y) enemyAngle = 0;              // Va in Basso
+        else if (nextY < enemy.y) enemyAngle = Math.PI;        // Va in Alto
 
         enemy.x = nextX;
         enemy.y = nextY;
@@ -217,8 +217,9 @@ function movePlayer(dir) {
         moved = true;
     }
 
+    // Effetto "rotolamento": aumenta l'angolo di rotazione ad ogni movimento
     if (moved) {
-        playerAngle += Math.PI * 0.5; // Giocatore rotola
+        playerAngle += Math.PI * 0.5;
     }
 
     checkCollision();
@@ -285,16 +286,13 @@ function draw() {
         ctx.fillRect(goal.x * cellSize + 4, goal.y * cellSize + 4, cellSize - 8, cellSize - 8);
     }
 
-    // 4. NEMICO CON CORREZIONE OFFSET SPRITE
+    // 4. NEMICO
     let ex = enemy.x * cellSize + cellSize / 2;
     let ey = enemy.y * cellSize + cellSize / 2;
 
     ctx.save();
     ctx.translate(ex, ey);
-    
-    // Correzione offset dello sprite originale (+90 gradi)
-    const enemyOffset = Math.PI * 0.5; 
-    ctx.rotate(enemyAngle + enemyOffset);
+    ctx.rotate(enemyAngle);
 
     if (enemyLoaded) {
         ctx.drawImage(imgEnemy, -(cellSize - 4) / 2, -(cellSize - 4) / 2, cellSize - 4, cellSize - 4);
@@ -379,7 +377,7 @@ function init() {
     player = { x: 0, y: 0 };
     playerAngle = 0;
     enemy = { x: cols - 1, y: rows - 1 };
-    enemyAngle = Math.PI * 1.5;
+    enemyAngle = Math.PI;
     goal = { x: cols - 1, y: rows - 1 };
     gameOver = false;
 
