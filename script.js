@@ -44,7 +44,7 @@ let player = { x: 0, y: 0 };
 let playerAngle = 0; // Rotazione progressiva per "rotolare"
 
 let enemy = { x: cols - 1, y: rows - 1 };
-let enemyAngle = Math.PI * 0.5; // Angolo direzionale del nemico
+let enemyAngle = Math.PI * 1.5; // Angolo iniziale (testa verso l'alto)
 
 let goal = { x: cols - 1, y: rows - 1 };
 
@@ -133,7 +133,7 @@ function generateMaze() {
     }
 }
 
-// 3. PATHFINDING NEMICO (BFS) CON ORIENTAMENTO CORRETTO
+// 3. PATHFINDING NEMICO (BFS)
 function getPathToPlayer() {
     let queue = [[ { x: enemy.x, y: enemy.y } ]];
     let visited = Array.from({ length: rows }, () => Array(cols).fill(false));
@@ -179,11 +179,11 @@ function moveEnemy() {
         let nextX = path[1].x;
         let nextY = path[1].y;
 
-        // Nemico: orienta la testa verso la direzione di movimento
-        if (nextX > enemy.x) enemyAngle = Math.PI;             // Destra
-        else if (nextX < enemy.x) enemyAngle = 0;              // Sinistra
-        else if (nextY > enemy.y) enemyAngle = Math.PI * 1.5;  // Basso
-        else if (nextY < enemy.y) enemyAngle = Math.PI * 0.5;  // Alto
+        // ORIENTAMENTO CORRETTO (Invertito di 180° per far puntare la testa in avanti)
+        if (nextX > enemy.x) enemyAngle = 0;                   // Va a Destra -> Testa a Destra
+        else if (nextX < enemy.x) enemyAngle = Math.PI;        // Va a Sinistra -> Testa a Sinistra
+        else if (nextY > enemy.y) enemyAngle = Math.PI * 0.5;  // Va in Basso -> Testa in Basso
+        else if (nextY < enemy.y) enemyAngle = Math.PI * 1.5;  // Va in Alto -> Testa in Alto
 
         enemy.x = nextX;
         enemy.y = nextY;
@@ -193,7 +193,7 @@ function moveEnemy() {
     draw();
 }
 
-// 4. MOVIMENTO GIOCATORE CON EFFETTO "ROTOLAMENTO"
+// 4. MOVIMENTO GIOCATORE CON ROTOLAMENTO
 function movePlayer(dir) {
     if (gameOver) return;
 
@@ -217,9 +217,9 @@ function movePlayer(dir) {
         moved = true;
     }
 
-    // Se si è mosso, ruota l'immagine ad ogni passo per simularne il rotolamento
+    // Effetto "rotolamento": aumenta l'angolo di rotazione ad ogni movimento
     if (moved) {
-        playerAngle += Math.PI * 0.5; // Ruota continuamente di 90°
+        playerAngle += Math.PI * 0.5;
     }
 
     checkCollision();
@@ -286,7 +286,7 @@ function draw() {
         ctx.fillRect(goal.x * cellSize + 4, goal.y * cellSize + 4, cellSize - 8, cellSize - 8);
     }
 
-    // 4. NEMICO CON ROTAZIONE DIREZIONALE
+    // 4. NEMICO
     let ex = enemy.x * cellSize + cellSize / 2;
     let ey = enemy.y * cellSize + cellSize / 2;
 
@@ -304,13 +304,13 @@ function draw() {
     }
     ctx.restore();
 
-    // 5. GIOCATORE CHE ROTOLA
+    // 5. GIOCATORE (ROTOLANTE)
     let px = player.x * cellSize + cellSize / 2;
     let py = player.y * cellSize + cellSize / 2;
 
     ctx.save();
     ctx.translate(px, py);
-    ctx.rotate(playerAngle); // Ruota in continuo ad ogni passo
+    ctx.rotate(playerAngle);
 
     if (playerLoaded) {
         ctx.drawImage(imgPlayer, -(cellSize - 4) / 2, -(cellSize - 4) / 2, cellSize - 4, cellSize - 4);
@@ -377,7 +377,7 @@ function init() {
     player = { x: 0, y: 0 };
     playerAngle = 0;
     enemy = { x: cols - 1, y: rows - 1 };
-    enemyAngle = Math.PI * 0.5;
+    enemyAngle = Math.PI * 1.5;
     goal = { x: cols - 1, y: rows - 1 };
     gameOver = false;
 
