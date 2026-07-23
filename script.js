@@ -195,49 +195,101 @@ function endGame(message, color) {
     clearInterval(gameLoopInterval);
 }
 
-// 6. GRAFICA E DISEGNO
+ // 6. GRAFICA E DISEGNO (Procedurale - Senza Immagini)
 function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // 1. DISEGNO SFONDO (Prato a scacchiera)
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            // Alterna due tonalità di verde per creare il pattern del prato
+            if ((r + c) % 2 === 0) {
+                ctx.fillStyle = "#335124"; // Verde scuro
+            } else {
+                ctx.fillStyle = "#3a5a29"; // Verde leggermente più chiaro
+            }
+            ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
+        }
+    }
 
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 2;
-
+    // 2. DISEGNO MURI (Siepi procedurali)
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
             let x = c * cellSize;
             let y = r * cellSize;
             let cell = grid[r][c];
 
-            if (cell.walls[0]) drawLine(x, y, x + cellSize, y);
-            if (cell.walls[1]) drawLine(x + cellSize, y, x + cellSize, y + cellSize);
-            if (cell.walls[2]) drawLine(x + cellSize, y + cellSize, x, y + cellSize);
-            if (cell.walls[3]) drawLine(x, y + cellSize, x, y);
+            // Chiamiamo la nostra nuova funzione per disegnare le siepi
+            if (cell.walls[0]) drawProceduralHedge(x, y, x + cellSize, y);
+            if (cell.walls[1]) drawProceduralHedge(x + cellSize, y, x + cellSize, y + cellSize);
+            if (cell.walls[2]) drawProceduralHedge(x + cellSize, y + cellSize, x, y + cellSize);
+            if (cell.walls[3]) drawProceduralHedge(x, y + cellSize, x, y);
         }
     }
 
-    // Uscita Verde
+    // 3. USCITA (Tassello Olografico Ciano)
     ctx.fillStyle = "#00adb5";
     ctx.fillRect(goal.x * cellSize + 4, goal.y * cellSize + 4, cellSize - 8, cellSize - 8);
+    ctx.fillStyle = "#ffffff"; // Centro luminoso
+    ctx.fillRect(goal.x * cellSize + 10, goal.y * cellSize + 10, cellSize - 20, cellSize - 20);
 
-    // Nemico Rosso
+    // 4. NEMICO (Sfera Rossa)
     ctx.fillStyle = "#ff2e63";
     ctx.beginPath();
     ctx.arc(enemy.x * cellSize + cellSize / 2, enemy.y * cellSize + cellSize / 2, cellSize / 3, 0, Math.PI * 2);
     ctx.fill();
+    // Occhio centrale per renderlo "cattivo"
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.arc(enemy.x * cellSize + cellSize / 2, enemy.y * cellSize + cellSize / 2, 3, 0, Math.PI * 2);
+    ctx.fill();
 
-    // Giocatore Giallo
+    // 5. GIOCATORE (Sfera Gialla)
     ctx.fillStyle = "#f9ed69";
     ctx.beginPath();
     ctx.arc(player.x * cellSize + cellSize / 2, player.y * cellSize + cellSize / 2, cellSize / 3, 0, Math.PI * 2);
     ctx.fill();
 }
 
-function drawLine(x1, y1, x2, y2) {
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.stroke();
+/**
+ * Funzione personalizzata per disegnare una siepe lungo un segmento.
+ * Crea l'illusione di foglie usando cerchi sovrapposti.
+ */
+function drawProceduralHedge(x1, y1, x2, y2) {
+    const thickness = 12; // Spessore della siepe
+    const length = Math.hypot(x2 - x1, y2 - y1);
+    const angle = Math.atan2(y2 - y1, x2 - x1);
+
+    ctx.save();
+    ctx.translate(x1, y1);
+    ctx.rotate(angle);
+
+    // Base scura rettangolare (il "tronco" / "ombra" della siepe)
+    ctx.fillStyle = '#11240e'; 
+    ctx.fillRect(0, -thickness / 2, length, thickness);
+
+    // Generazione delle foglie (Cerchi sovrapposti)
+    // NOTA: Usiamo Math.sin invece di Math.random() per evitare che le foglie 
+    // "tremino" ogni volta che il giocatore si muove e il canvas viene ridisegnato.
+    for (let i = 0; i <= length; i += 4) {
+        let offsetY = Math.sin(i * 0.7) * 2.5; // Crea un effetto ondulato organico fisso
+        
+        // Foglia base (Verde medio)
+        ctx.fillStyle = '#204519';
+        ctx.beginPath();
+        ctx.arc(i, offsetY, thickness * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Riflesso di luce sulla foglia (Verde chiaro)
+        ctx.fillStyle = '#346b2a';
+        ctx.beginPath();
+        ctx.arc(i - 1.5, offsetY - 1.5, thickness * 0.25, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    ctx.restore();
 }
+
+  
+ 
 
 // 7. TIMER 80 SECONDI
 function startTimer() {
