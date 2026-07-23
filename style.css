@@ -133,3 +133,20 @@ canvas {
     color: #c2d4b2;
     font-weight: bold;
 }
+
+
+
+body {
+    background-color: #2b1e16;
+    background-image: url('sfondo.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed; 
+    color: #f4eae1;
+    font-family: 'MatchaCih', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
