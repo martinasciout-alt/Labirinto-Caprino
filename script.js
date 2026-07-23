@@ -44,7 +44,7 @@ let player = { x: 0, y: 0 };
 let playerAngle = 0; 
 
 let enemy = { x: cols - 1, y: rows - 1 };
-let enemyAngle = 0; 
+let enemyAngle = Math.PI * 0.5; // Inizializzato per puntare la testa verso l'alto
 
 let goal = { x: cols - 1, y: rows - 1 };
 
@@ -179,11 +179,11 @@ function moveEnemy() {
         let nextX = path[1].x;
         let nextY = path[1].y;
 
-        // Angoli invertiti esattamente di 180° (Math.PI) rispetto a prima
-        if (nextX > enemy.x) enemyAngle = 0;                   // Destra
-        else if (nextX < enemy.x) enemyAngle = Math.PI;        // Sinistra
-        else if (nextY > enemy.y) enemyAngle = Math.PI * 0.5;  // Basso
-        else if (nextY < enemy.y) enemyAngle = Math.PI * 1.5;  // Alto
+        // Angoli corretti per allineare la testa del nemico con la direzione
+        if (nextX > enemy.x) enemyAngle = Math.PI;             // Destra
+        else if (nextX < enemy.x) enemyAngle = 0;              // Sinistra
+        else if (nextY > enemy.y) enemyAngle = Math.PI * 1.5;  // Basso
+        else if (nextY < enemy.y) enemyAngle = Math.PI * 0.5;  // Alto
 
         enemy.x = nextX;
         enemy.y = nextY;
@@ -279,7 +279,7 @@ function draw() {
         ctx.fillRect(goal.x * cellSize + 4, goal.y * cellSize + 4, cellSize - 8, cellSize - 8);
     }
 
-    // 4. NEMICO CON ROTAZIONE CAPOVOLTA
+    // 4. NEMICO CON ROTAZIONE CORRETTA
     let ex = enemy.x * cellSize + cellSize / 2;
     let ey = enemy.y * cellSize + cellSize / 2;
 
@@ -370,7 +370,7 @@ function init() {
     player = { x: 0, y: 0 };
     playerAngle = 0;
     enemy = { x: cols - 1, y: rows - 1 };
-    enemyAngle = Math.PI * 1.5; // Angolo iniziale capovolto per puntare in alto
+    enemyAngle = Math.PI * 0.5; // Testa orientata verso l'alto all'inizio
     goal = { x: cols - 1, y: rows - 1 };
     gameOver = false;
 
