@@ -34,6 +34,7 @@ body {
     border-radius: 16px;
     border: 3px solid #8fa87a;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    max-width: 100vw;
 }
 
 h1 {
@@ -66,6 +67,7 @@ h1 {
 .canvas-wrapper {
     position: relative;
     display: inline-block;
+    max-width: 100%;
 }
 
 canvas {
@@ -73,6 +75,8 @@ canvas {
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     display: block;
+    max-width: 100%;
+    height: auto;
 }
 
 /* POPUP INIZIO GIOCO */
@@ -188,4 +192,95 @@ canvas {
     font-size: 0.95rem;
     color: #c2d4b2;
     font-weight: bold;
+}
+
+/* CONTROLLI TOUCH MOBILE */
+.touch-controls {
+    display: grid;
+    grid-template-columns: repeat(3, 50px);
+    grid-template-rows: repeat(2, 50px);
+    gap: 8px;
+    margin-top: 15px;
+    justify-content: center;
+}
+
+.touch-btn {
+    background-color: #2a1f18;
+    color: #f4eae1;
+    border: 2px solid #8fa87a;
+    border-radius: 12px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.touch-btn:active {
+    background-color: #8fa87a;
+    color: #2b1e16;
+    transform: scale(0.95);
+}
+
+#btn-up {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+#btn-left {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+#btn-down {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+#btn-right {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+/* RIDIMENSIONAMENTO PER DISPOSITIVI MOBILI */
+@media (max-width: 600px) {
+    .game-container {
+        padding: 12px;
+        width: 95vw;
+    }
+
+    h1 {
+        font-size: 1.4rem;
+        margin-bottom: 8px;
+    }
+
+    .hud {
+        gap: 5px;
+        margin-bottom: 10px;
+        font-size: 0.85rem;
+    }
+
+    #timer-box {
+        padding: 5px 14px;
+    }
+
+    #timer {
+        font-size: 1.1rem;
+    }
+
+    .controls-hint {
+        display: none;
+    }
+}
+
+/* Mostra i controlli touch solo su schermi touch/mobili */
+@media (hover: hover) and (pointer: fine) {
+    .touch-controls {
+        display: none;
+    }
 }
