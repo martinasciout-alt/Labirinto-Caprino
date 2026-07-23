@@ -41,10 +41,10 @@ imgEnemy.onerror = () => console.error("Errore: Impossibile caricare 'nemico.web
 
 let grid = [];
 let player = { x: 0, y: 0 };
-let playerAngle = 0; 
+let playerAngle = 0; // Rotazione progressiva per "rotolare"
 
 let enemy = { x: cols - 1, y: rows - 1 };
-let enemyAngle = Math.PI * 0.5; // Inizializzato per puntare la testa verso l'alto
+let enemyAngle = Math.PI * 0.5; // Angolo direzionale del nemico
 
 let goal = { x: cols - 1, y: rows - 1 };
 
@@ -133,7 +133,7 @@ function generateMaze() {
     }
 }
 
-// 3. PATHFINDING NEMICO (BFS)
+// 3. PATHFINDING NEMICO (BFS) CON ORIENTAMENTO CORRETTO
 function getPathToPlayer() {
     let queue = [[ { x: enemy.x, y: enemy.y } ]];
     let visited = Array.from({ length: rows }, () => Array(cols).fill(false));
@@ -179,7 +179,7 @@ function moveEnemy() {
         let nextX = path[1].x;
         let nextY = path[1].y;
 
-        // Angoli corretti per allineare la testa del nemico con la direzione
+        // Nemico: orienta la testa verso la direzione di movimento
         if (nextX > enemy.x) enemyAngle = Math.PI;             // Destra
         else if (nextX < enemy.x) enemyAngle = 0;              // Sinistra
         else if (nextY > enemy.y) enemyAngle = Math.PI * 1.5;  // Basso
@@ -193,26 +193,33 @@ function moveEnemy() {
     draw();
 }
 
-// 4. MOVIMENTO GIOCATORE CON AGGIORNAMENTO ANGOLO
+// 4. MOVIMENTO GIOCATORE CON EFFETTO "ROTOLAMENTO"
 function movePlayer(dir) {
     if (gameOver) return;
 
     let cell = grid[player.y][player.x];
+    let moved = false;
+
     if (dir === 'UP' && !cell.walls[0]) {
         player.y--;
-        playerAngle = Math.PI * 1.5; // Alto
+        moved = true;
     }
     if (dir === 'RIGHT' && !cell.walls[1]) {
         player.x++;
-        playerAngle = 0; // Destra
+        moved = true;
     }
     if (dir === 'DOWN' && !cell.walls[2]) {
         player.y++;
-        playerAngle = Math.PI * 0.5; // Basso
+        moved = true;
     }
     if (dir === 'LEFT' && !cell.walls[3]) {
         player.x--;
-        playerAngle = Math.PI; // Sinistra
+        moved = true;
+    }
+
+    // Se si è mosso, ruota l'immagine ad ogni passo per simularne il rotolamento
+    if (moved) {
+        playerAngle += Math.PI * 0.5; // Ruota continuamente di 90°
     }
 
     checkCollision();
@@ -279,7 +286,7 @@ function draw() {
         ctx.fillRect(goal.x * cellSize + 4, goal.y * cellSize + 4, cellSize - 8, cellSize - 8);
     }
 
-    // 4. NEMICO CON ROTAZIONE CORRETTA
+    // 4. NEMICO CON ROTAZIONE DIREZIONALE
     let ex = enemy.x * cellSize + cellSize / 2;
     let ey = enemy.y * cellSize + cellSize / 2;
 
@@ -297,13 +304,13 @@ function draw() {
     }
     ctx.restore();
 
-    // 5. GIOCATORE CON ROTAZIONE DINAMICA
+    // 5. GIOCATORE CHE ROTOLA
     let px = player.x * cellSize + cellSize / 2;
     let py = player.y * cellSize + cellSize / 2;
 
     ctx.save();
     ctx.translate(px, py);
-    ctx.rotate(playerAngle);
+    ctx.rotate(playerAngle); // Ruota in continuo ad ogni passo
 
     if (playerLoaded) {
         ctx.drawImage(imgPlayer, -(cellSize - 4) / 2, -(cellSize - 4) / 2, cellSize - 4, cellSize - 4);
@@ -370,7 +377,7 @@ function init() {
     player = { x: 0, y: 0 };
     playerAngle = 0;
     enemy = { x: cols - 1, y: rows - 1 };
-    enemyAngle = Math.PI * 0.5; // Testa orientata verso l'alto all'inizio
+    enemyAngle = Math.PI * 0.5;
     goal = { x: cols - 1, y: rows - 1 };
     gameOver = false;
 
