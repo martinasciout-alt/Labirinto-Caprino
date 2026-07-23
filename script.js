@@ -2,6 +2,8 @@ const canvas = document.getElementById('mazeCanvas');
 const ctx = canvas.getContext('2d');
 const timerElement = document.getElementById('timer');
 const statusElement = document.getElementById('status');
+const overlay = document.getElementById('game-over-overlay');
+const endGameImg = document.getElementById('end-game-img');
 
 // Parametri Griglia
 const rows = 15;
@@ -44,7 +46,7 @@ let player = { x: 0, y: 0 };
 let playerAngle = 0; // Rotazione progressiva
 
 let enemy = { x: cols - 1, y: rows - 1 };
-let enemyAngle = Math.PI; // puntare verso l'alto
+let enemyAngle = Math.PI; // Puntare verso l'alto
 
 let goal = { x: cols - 1, y: rows - 1 };
 
@@ -52,7 +54,6 @@ let timeLeft = 80;
 let timerInterval = null;
 let gameLoopInterval = null;
 let gameOver = false;
-
 
 class Cell {
     constructor(r, c) {
@@ -179,10 +180,9 @@ function moveEnemy() {
         let nextX = path[1].x;
         let nextY = path[1].y;
 
-        
         if (nextX > enemy.x) enemyAngle = Math.PI * 0.5;       // Va a Destra
         else if (nextX < enemy.x) enemyAngle = Math.PI * 1.5;  // Va a Sinistra
-      else if (nextY > enemy.y) enemyAngle = Math.PI * 1.0;  // Va in Basso
+        else if (nextY > enemy.y) enemyAngle = Math.PI * 1.0;  // Va in Basso
         else if (nextY < enemy.y) enemyAngle = Math.PI * 2.0;  // Va in Alto 
 
         enemy.x = nextX;
@@ -217,7 +217,6 @@ function movePlayer(dir) {
         moved = true;
     }
 
-    
     if (moved) {
         playerAngle += Math.PI * 0.5;
     }
@@ -233,11 +232,6 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') movePlayer('LEFT');
 });
 
- 
- 
-const overlay = document.getElementById('game-over-overlay');
-const endGameImg = document.getElementById('end-game-img');
-
 // 5. CONTROLLO COLLISIONI E VITTORIA
 function checkCollision() {
     if (player.x === enemy.x && player.y === enemy.y) {
@@ -252,14 +246,12 @@ function endGame(message, color, imgSource) {
     statusElement.innerText = message;
     statusElement.style.color = color;
     
- 
     endGameImg.src = imgSource;
     overlay.classList.remove('hidden');
 
     clearInterval(timerInterval);
     clearInterval(gameLoopInterval);
 }
-
 
 // 6. GRAFICA E DISEGNO
 function draw() {
@@ -375,7 +367,7 @@ function startTimer() {
             timeLeft = 80;
             statusElement.innerText = "IL LABIRINTO È CAMBIATO!";
             setTimeout(() => {
-                if (!gameOver) statusElement.innerText = "Raggiungi l'uscita!";
+                if (!gameOver) statusElement.innerText = "Arriva all'uscita prima di essere raggiunto!";
             }, 2000);
             draw();
         }
@@ -384,12 +376,10 @@ function startTimer() {
 
 // 8. AVVIO / RESTART DEL GIOCO
 function init() {
-    
     overlay.classList.add('hidden');
     statusElement.innerText = "Arriva all'uscita prima di essere raggiunto!";
     statusElement.style.color = "#c2d4b2";
 
-    
     clearInterval(timerInterval);
     clearInterval(gameLoopInterval);
 
