@@ -41,10 +41,10 @@ imgEnemy.onerror = () => console.error("Errore: Impossibile caricare 'nemico.web
 
 let grid = [];
 let player = { x: 0, y: 0 };
-let playerAngle = 0; // Rotazione progressiva per "rotolare"
+let playerAngle = 0; // Rotazione progressiva
 
 let enemy = { x: cols - 1, y: rows - 1 };
-let enemyAngle = Math.PI; // Inizializzato per puntare verso l'alto
+let enemyAngle = Math.PI; // puntare verso l'alto
 
 let goal = { x: cols - 1, y: rows - 1 };
 
@@ -53,7 +53,7 @@ let timerInterval = null;
 let gameLoopInterval = null;
 let gameOver = false;
 
-// Struttura Cella per Recursive Backtracker
+
 class Cell {
     constructor(r, c) {
         this.r = r;
@@ -90,7 +90,7 @@ function removeWalls(a, b) {
     else if (y === -1) { a.walls[2] = false; b.walls[0] = false; }
 }
 
-// 2. GENERAZIONE LABIRINTO (con Vie Alternative)
+// 2. GENERAZIONE LABIRINTO
 function generateMaze() {
     grid = [];
     for (let r = 0; r < rows; r++) {
@@ -133,7 +133,7 @@ function generateMaze() {
     }
 }
 
-// 3. PATHFINDING NEMICO (BFS)
+// 3. PATHFINDING NEMICO
 function getPathToPlayer() {
     let queue = [[ { x: enemy.x, y: enemy.y } ]];
     let visited = Array.from({ length: rows }, () => Array(cols).fill(false));
@@ -179,11 +179,11 @@ function moveEnemy() {
         let nextX = path[1].x;
         let nextY = path[1].y;
 
-        // ANGOLI RUOTATI DI 90° PER ALLINEARE LA TESTA
+        
         if (nextX > enemy.x) enemyAngle = Math.PI * 0.5;       // Va a Destra
         else if (nextX < enemy.x) enemyAngle = Math.PI * 1.5;  // Va a Sinistra
       else if (nextY > enemy.y) enemyAngle = Math.PI * 1.0;  // Va in Basso
-        else if (nextY < enemy.y) enemyAngle = Math.PI * 2.0;  // Va in Alto (o 0)
+        else if (nextY < enemy.y) enemyAngle = Math.PI * 2.0;  // Va in Alto 
 
         enemy.x = nextX;
         enemy.y = nextY;
@@ -217,7 +217,7 @@ function movePlayer(dir) {
         moved = true;
     }
 
-    // Effetto "rotolamento": aumenta l'angolo di rotazione ad ogni movimento
+    
     if (moved) {
         playerAngle += Math.PI * 0.5;
     }
