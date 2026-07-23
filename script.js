@@ -12,22 +12,25 @@ canvas.width = cols * cellSize;
 canvas.height = rows * cellSize;
 
 // CARICAMENTO IMMAGINI
+let goalLoaded = false;
 const imgGoal = new Image();
 imgGoal.src = 'arrivo.png';
-
-let goalLoaded = false;
 imgGoal.onload = () => {
     goalLoaded = true;
     if (grid.length > 0) draw();
 };
-
-const imgPlayer = new Image();
-imgPlayer.src = 'giocatore.webp'; // Caricamento del nuovo sprite del giocatore
+imgGoal.onerror = () => console.error("Errore: Impossibile caricare 'arrivo.png'");
 
 let playerLoaded = false;
+const imgPlayer = new Image();
+imgPlayer.src = 'giocatore.webp';  
+
 imgPlayer.onload = () => {
     playerLoaded = true;
     if (grid.length > 0) draw();
+};
+imgPlayer.onerror = () => {
+    console.error("Errore: Impossibile caricare 'giocatore.webp'. Verifica il percorso o l'estensione!");
 };
 
 let grid = [];
@@ -45,7 +48,6 @@ class Cell {
     constructor(r, c) {
         this.r = r;
         this.c = c;
-        // Muri: [Nord, Est, Sud, Ovest]
         this.walls = [true, true, true, true];
         this.visited = false;
     }
@@ -93,7 +95,6 @@ function generateMaze() {
     let current = grid[0][0];
     current.visited = true;
 
-    // FASE A: Algoritmo base
     do {
         let next = getUnvisitedNeighbor(current);
         if (next) {
@@ -106,9 +107,7 @@ function generateMaze() {
         }
     } while (stack.length > 0);
 
-    // FASE B: Percorsi alternativi (~15% di muri rimossi)
     let extraPaths = Math.floor((rows * cols) * 0.15);
-    
     for (let i = 0; i < extraPaths; i++) {
         let randomRow = Math.floor(Math.random() * (rows - 2)) + 1;
         let randomCol = Math.floor(Math.random() * (cols - 2)) + 1;
@@ -140,10 +139,10 @@ function getPathToPlayer() {
 
         let cell = grid[curr.y][curr.x];
         let moves = [
-            { dx: 0, dy: -1, wall: 0 }, // Nord
-            { dx: 1, dy: 0, wall: 1 },  // Est
-            { dx: 0, dy: 1, wall: 2 },  // Sud
-            { dx: -1, dy: 0, wall: 3 }  // Ovest
+            { dx: 0, dy: -1, wall: 0 },
+            { dx: 1, dy: 0, wall: 1 },
+            { dx: 0, dy: 1, wall: 2 },
+            { dx: -1, dy: 0, wall: 3 }
         ];
 
         for (let move of moves) {
@@ -214,21 +213,21 @@ function endGame(message, color) {
     clearInterval(gameLoopInterval);
 }
 
-// 6. GRAFICA E DISEGNO (Procedurale - Senza Immagini per Siepi/Prato)
+// 6. GRAFICA E DISEGNO
 function draw() {
-    // 1. DISEGNO SFONDO (Prato a scacchiera)
+    // 1. SFONDO
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
             if ((r + c) % 2 === 0) {
-                ctx.fillStyle = "#335124"; // Verde scuro
+                ctx.fillStyle = "#335124";
             } else {
-                ctx.fillStyle = "#3a5a29"; // Verde leggermente più chiaro
+                ctx.fillStyle = "#3a5a29";
             }
             ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
         }
     }
 
-    // 2. DISEGNO MURI (Siepi procedurali)
+    // 2. MURI
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
             let x = c * cellSize;
@@ -242,21 +241,15 @@ function draw() {
         }
     }
 
-    // 3. USCITA (Immagine arrivo.png)
+    // 3. USCITA
     if (goalLoaded) {
-        ctx.drawImage(
-            imgGoal, 
-            goal.x * cellSize + 2, 
-            goal.y * cellSize + 2, 
-            cellSize - 4, 
-            cellSize - 4
-        );
+        ctx.drawImage(imgGoal, goal.x * cellSize + 2, goal.y * cellSize + 2, cellSize - 4, cellSize - 4);
     } else {
         ctx.fillStyle = "#00adb5";
         ctx.fillRect(goal.x * cellSize + 4, goal.y * cellSize + 4, cellSize - 8, cellSize - 8);
     }
 
-    // 4. NEMICO (Sfera Rossa)
+    // 4. NEMICO
     ctx.fillStyle = "#ff2e63";
     ctx.beginPath();
     ctx.arc(enemy.x * cellSize + cellSize / 2, enemy.y * cellSize + cellSize / 2, cellSize / 3, 0, Math.PI * 2);
@@ -266,27 +259,16 @@ function draw() {
     ctx.arc(enemy.x * cellSize + cellSize / 2, enemy.y * cellSize + cellSize / 2, 3, 0, Math.PI * 2);
     ctx.fill();
 
-    // 5. GIOCATORE (Immagine giocatore.webp)
+    // 5. GIOCATORE (SE CARICATO DISEGNA L'IMMAGINE)
     if (playerLoaded) {
-        ctx.drawImage(
-            imgPlayer, 
-            player.x * cellSize + 2, 
-            player.y * cellSize + 2, 
-            cellSize - 4, 
-            cellSize - 4
-        );
+        ctx.drawImage(imgPlayer, player.x * cellSize + 2, player.y * cellSize + 2, cellSize - 4, cellSize - 4);
     } else {
-        // Fallback temporaneo (Sfera Gialla) se l'immagine sta ancora caricando
-        ctx.fillStyle = "#f9ed69";
-        ctx.beginPath();
-        ctx.arc(player.x * cellSize + cellSize / 2, player.y * cellSize + cellSize / 2, cellSize / 3, 0, Math.PI * 2);
-        ctx.fill();
+        // Rilevamento visivo di errore: Se l'immagine non carica mostra un quadrato viola
+        ctx.fillStyle = "#9b59b6"; 
+        ctx.fillRect(player.x * cellSize + 4, player.y * cellSize + 4, cellSize - 8, cellSize - 8);
     }
 }
 
-/**
- * Funzione per disegnare la siepe procedurale
- */
 function drawProceduralHedge(x1, y1, x2, y2) {
     const thickness = 12; 
     const length = Math.hypot(x2 - x1, y2 - y1);
@@ -316,7 +298,7 @@ function drawProceduralHedge(x1, y1, x2, y2) {
     ctx.restore();
 }
 
-// 7. TIMER 80 SECONDI
+// 7. TIMER
 function startTimer() {
     timeLeft = 80;
     timerElement.innerText = timeLeft;
