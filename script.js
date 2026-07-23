@@ -41,8 +41,11 @@ imgEnemy.onerror = () => console.error("Errore: Impossibile caricare 'nemico.web
 
 let grid = [];
 let player = { x: 0, y: 0 };
-let playerAngle = 0; // Angolo di rotazione del giocatore (in radianti)
+let playerAngle = 0; // Angolo di rotazione del giocatore
+
 let enemy = { x: cols - 1, y: rows - 1 };
+let enemyAngle = 0; // Nuova variabile: Angolo di rotazione del nemico
+
 let goal = { x: cols - 1, y: rows - 1 };
 
 let timeLeft = 80;
@@ -130,7 +133,7 @@ function generateMaze() {
     }
 }
 
-// 3. PATHFINDING NEMICO (BFS)
+// 3. PATHFINDING NEMICO (BFS) CON ROTAZIONE
 function getPathToPlayer() {
     let queue = [[ { x: enemy.x, y: enemy.y } ]];
     let visited = Array.from({ length: rows }, () => Array(cols).fill(false));
@@ -174,8 +177,17 @@ function moveEnemy() {
     let stepsToMove = Math.floor((path.length - 1) / 2);
 
     if (stepsToMove > 0 && path[1]) {
-        enemy.x = path[1].x;
-        enemy.y = path[1].y;
+        let nextX = path[1].x;
+        let nextY = path[1].y;
+
+        // Calcola la direzione del nemico per ruotare l'immagine
+        if (nextX > enemy.x) enemyAngle = 0;              // Destra
+        else if (nextX < enemy.x) enemyAngle = Math.PI;   // Sinistra
+        else if (nextY > enemy.y) enemyAngle = Math.PI * 0.5;  // Basso
+        else if (nextY < enemy.y) enemyAngle = Math.PI * 1.5;  // Alto
+
+        enemy.x = nextX;
+        enemy.y = nextY;
     }
 
     checkCollision();
@@ -189,19 +201,19 @@ function movePlayer(dir) {
     let cell = grid[player.y][player.x];
     if (dir === 'UP' && !cell.walls[0]) {
         player.y--;
-        playerAngle = Math.PI * 1.5; // -90° (Guarda in alto)
+        playerAngle = Math.PI * 1.5; // Alto
     }
     if (dir === 'RIGHT' && !cell.walls[1]) {
         player.x++;
-        playerAngle = 0; // 0° (Guarda a destra)
+        playerAngle = 0; // Destra
     }
     if (dir === 'DOWN' && !cell.walls[2]) {
         player.y++;
-        playerAngle = Math.PI * 0.5; // 90° (Guarda in basso)
+        playerAngle = Math.PI * 0.5; // Basso
     }
     if (dir === 'LEFT' && !cell.walls[3]) {
         player.x--;
-        playerAngle = Math.PI; // 180° (Guarda a sinistra)
+        playerAngle = Math.PI; // Sinistra
     }
 
     checkCollision();
@@ -268,32 +280,39 @@ function draw() {
         ctx.fillRect(goal.x * cellSize + 4, goal.y * cellSize + 4, cellSize - 8, cellSize - 8);
     }
 
-    // 4. NEMICO
+    // 4. NEMICO CON ROTAZIONE DINAMICA
+    let ex = enemy.x * cellSize + cellSize / 2;
+    let ey = enemy.y * cellSize + cellSize / 2;
+
+    ctx.save();
+    ctx.translate(ex, ey);
+    ctx.rotate(enemyAngle);
+
     if (enemyLoaded) {
-        ctx.drawImage(imgEnemy, enemy.x * cellSize + 2, enemy.y * cellSize + 2, cellSize - 4, cellSize - 4);
+        ctx.drawImage(imgEnemy, -(cellSize - 4) / 2, -(cellSize - 4) / 2, cellSize - 4, cellSize - 4);
     } else {
         ctx.fillStyle = "#ff2e63";
         ctx.beginPath();
-        ctx.arc(enemy.x * cellSize + cellSize / 2, enemy.y * cellSize + cellSize / 2, cellSize / 3, 0, Math.PI * 2);
+        ctx.arc(0, 0, cellSize / 3, 0, Math.PI * 2);
         ctx.fill();
     }
+    ctx.restore();
 
     // 5. GIOCATORE CON ROTAZIONE DINAMICA
     let px = player.x * cellSize + cellSize / 2;
     let py = player.y * cellSize + cellSize / 2;
 
     ctx.save();
-    ctx.translate(px, py); // Sposta l'origine al centro del giocatore
-    ctx.rotate(playerAngle); // Ruota la tela in base all'angolo attuale
+    ctx.translate(px, py);
+    ctx.rotate(playerAngle);
 
     if (playerLoaded) {
-        // Disegna l'immagine centrata rispetto all'origine ruotata
         ctx.drawImage(imgPlayer, -(cellSize - 4) / 2, -(cellSize - 4) / 2, cellSize - 4, cellSize - 4);
     } else {
         ctx.fillStyle = "#9b59b6";
         ctx.fillRect(-(cellSize - 8) / 2, -(cellSize - 8) / 2, cellSize - 8, cellSize - 8);
     }
-    ctx.restore(); // Ripristina il contesto grafico
+    ctx.restore();
 }
 
 function drawProceduralHedge(x1, y1, x2, y2) {
@@ -352,6 +371,7 @@ function init() {
     player = { x: 0, y: 0 };
     playerAngle = 0;
     enemy = { x: cols - 1, y: rows - 1 };
+    enemyAngle = 0;
     goal = { x: cols - 1, y: rows - 1 };
     gameOver = false;
 
