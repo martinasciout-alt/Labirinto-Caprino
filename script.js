@@ -41,10 +41,10 @@ imgEnemy.onerror = () => console.error("Errore: Impossibile caricare 'nemico.web
 
 let grid = [];
 let player = { x: 0, y: 0 };
-let playerAngle = 0; // Angolo di rotazione del giocatore
+let playerAngle = 0; 
 
 let enemy = { x: cols - 1, y: rows - 1 };
-let enemyAngle = 0; // Nuova variabile: Angolo di rotazione del nemico
+let enemyAngle = 0; 
 
 let goal = { x: cols - 1, y: rows - 1 };
 
@@ -133,7 +133,7 @@ function generateMaze() {
     }
 }
 
-// 3. PATHFINDING NEMICO (BFS) CON ROTAZIONE
+// 3. PATHFINDING NEMICO (BFS)
 function getPathToPlayer() {
     let queue = [[ { x: enemy.x, y: enemy.y } ]];
     let visited = Array.from({ length: rows }, () => Array(cols).fill(false));
@@ -174,17 +174,17 @@ function moveEnemy() {
     if (gameOver) return;
 
     let path = getPathToPlayer();
-    let stepsToMove = Math.floor((path.length - 1) / 2);
 
-    if (stepsToMove > 0 && path[1]) {
+    // Se esiste un percorso verso il giocatore (almeno la casella adiacente path[1])
+    if (path.length > 1 && path[1]) {
         let nextX = path[1].x;
         let nextY = path[1].y;
 
-        // Calcola la direzione del nemico per ruotare l'immagine
-        if (nextX > enemy.x) enemyAngle = 0;              // Destra
-        else if (nextX < enemy.x) enemyAngle = Math.PI;   // Sinistra
-        else if (nextY > enemy.y) enemyAngle = Math.PI * 0.5;  // Basso
-        else if (nextY < enemy.y) enemyAngle = Math.PI * 1.5;  // Alto
+        // Calcola l'angolo orientato correttamente (invertito di 180° per mettere i piedi in basso)
+        if (nextX > enemy.x) enemyAngle = Math.PI;             // Invece di 0° -> 180°
+        else if (nextX < enemy.x) enemyAngle = 0;              // Invece di 180° -> 0°
+        else if (nextY > enemy.y) enemyAngle = Math.PI * 1.5;  // Invece di 90° -> 270°
+        else if (nextY < enemy.y) enemyAngle = Math.PI * 0.5;  // Invece di 270° -> 90°
 
         enemy.x = nextX;
         enemy.y = nextY;
@@ -280,7 +280,7 @@ function draw() {
         ctx.fillRect(goal.x * cellSize + 4, goal.y * cellSize + 4, cellSize - 8, cellSize - 8);
     }
 
-    // 4. NEMICO CON ROTAZIONE DINAMICA
+    // 4. NEMICO CON ROTAZIONE CORRETTA
     let ex = enemy.x * cellSize + cellSize / 2;
     let ey = enemy.y * cellSize + cellSize / 2;
 
