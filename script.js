@@ -9,7 +9,6 @@ const endGameImg = document.getElementById('end-game-img');
 const audioVittoria = new Audio('vittoria.wav');
 const audioSconfitta = new Audio('sconfitta.mp3');
 
-// Opzionale: Regola il volume (da 0.0 a 1.0)
 audioVittoria.volume = 0.7;
 audioSconfitta.volume = 0.7;
 
