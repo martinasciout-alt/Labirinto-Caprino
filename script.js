@@ -23,18 +23,25 @@ imgGoal.onerror = () => console.error("Errore: Impossibile caricare 'arrivo.png'
 
 let playerLoaded = false;
 const imgPlayer = new Image();
-imgPlayer.src = 'giocatore.webp';  
-
+imgPlayer.src = 'giocatore.webp';
 imgPlayer.onload = () => {
     playerLoaded = true;
     if (grid.length > 0) draw();
 };
-imgPlayer.onerror = () => {
-    console.error("Errore: Impossibile caricare 'giocatore.webp'. Verifica il percorso o l'estensione!");
+imgPlayer.onerror = () => console.error("Errore: Impossibile caricare 'giocatore.webp'");
+
+let enemyLoaded = false;
+const imgEnemy = new Image();
+imgEnemy.src = 'nemico.webp';
+imgEnemy.onload = () => {
+    enemyLoaded = true;
+    if (grid.length > 0) draw();
 };
+imgEnemy.onerror = () => console.error("Errore: Impossibile caricare 'nemico.webp'");
 
 let grid = [];
 let player = { x: 0, y: 0 };
+let playerAngle = 0; // Angolo di rotazione del giocatore (in radianti)
 let enemy = { x: cols - 1, y: rows - 1 };
 let goal = { x: cols - 1, y: rows - 1 };
 
@@ -175,15 +182,27 @@ function moveEnemy() {
     draw();
 }
 
-// 4. MOVIMENTO GIOCATORE
+// 4. MOVIMENTO GIOCATORE CON AGGIORNAMENTO ANGOLO
 function movePlayer(dir) {
     if (gameOver) return;
 
     let cell = grid[player.y][player.x];
-    if (dir === 'UP' && !cell.walls[0]) player.y--;
-    if (dir === 'RIGHT' && !cell.walls[1]) player.x++;
-    if (dir === 'DOWN' && !cell.walls[2]) player.y++;
-    if (dir === 'LEFT' && !cell.walls[3]) player.x--;
+    if (dir === 'UP' && !cell.walls[0]) {
+        player.y--;
+        playerAngle = Math.PI * 1.5; // -90° (Guarda in alto)
+    }
+    if (dir === 'RIGHT' && !cell.walls[1]) {
+        player.x++;
+        playerAngle = 0; // 0° (Guarda a destra)
+    }
+    if (dir === 'DOWN' && !cell.walls[2]) {
+        player.y++;
+        playerAngle = Math.PI * 0.5; // 90° (Guarda in basso)
+    }
+    if (dir === 'LEFT' && !cell.walls[3]) {
+        player.x--;
+        playerAngle = Math.PI; // 180° (Guarda a sinistra)
+    }
 
     checkCollision();
     draw();
@@ -250,23 +269,31 @@ function draw() {
     }
 
     // 4. NEMICO
-    ctx.fillStyle = "#ff2e63";
-    ctx.beginPath();
-    ctx.arc(enemy.x * cellSize + cellSize / 2, enemy.y * cellSize + cellSize / 2, cellSize / 3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#ffffff";
-    ctx.beginPath();
-    ctx.arc(enemy.x * cellSize + cellSize / 2, enemy.y * cellSize + cellSize / 2, 3, 0, Math.PI * 2);
-    ctx.fill();
-
-    // 5. GIOCATORE (SE CARICATO DISEGNA L'IMMAGINE)
-    if (playerLoaded) {
-        ctx.drawImage(imgPlayer, player.x * cellSize + 2, player.y * cellSize + 2, cellSize - 4, cellSize - 4);
+    if (enemyLoaded) {
+        ctx.drawImage(imgEnemy, enemy.x * cellSize + 2, enemy.y * cellSize + 2, cellSize - 4, cellSize - 4);
     } else {
-        // Rilevamento visivo di errore: Se l'immagine non carica mostra un quadrato viola
-        ctx.fillStyle = "#9b59b6"; 
-        ctx.fillRect(player.x * cellSize + 4, player.y * cellSize + 4, cellSize - 8, cellSize - 8);
+        ctx.fillStyle = "#ff2e63";
+        ctx.beginPath();
+        ctx.arc(enemy.x * cellSize + cellSize / 2, enemy.y * cellSize + cellSize / 2, cellSize / 3, 0, Math.PI * 2);
+        ctx.fill();
     }
+
+    // 5. GIOCATORE CON ROTAZIONE DINAMICA
+    let px = player.x * cellSize + cellSize / 2;
+    let py = player.y * cellSize + cellSize / 2;
+
+    ctx.save();
+    ctx.translate(px, py); // Sposta l'origine al centro del giocatore
+    ctx.rotate(playerAngle); // Ruota la tela in base all'angolo attuale
+
+    if (playerLoaded) {
+        // Disegna l'immagine centrata rispetto all'origine ruotata
+        ctx.drawImage(imgPlayer, -(cellSize - 4) / 2, -(cellSize - 4) / 2, cellSize - 4, cellSize - 4);
+    } else {
+        ctx.fillStyle = "#9b59b6";
+        ctx.fillRect(-(cellSize - 8) / 2, -(cellSize - 8) / 2, cellSize - 8, cellSize - 8);
+    }
+    ctx.restore(); // Ripristina il contesto grafico
 }
 
 function drawProceduralHedge(x1, y1, x2, y2) {
@@ -323,6 +350,7 @@ function startTimer() {
 function init() {
     generateMaze();
     player = { x: 0, y: 0 };
+    playerAngle = 0;
     enemy = { x: cols - 1, y: rows - 1 };
     goal = { x: cols - 1, y: rows - 1 };
     gameOver = false;
