@@ -151,7 +151,7 @@ canvas {
     display: none !important;
 }
 
-/* TASTO RESTART IN ALTO */
+/* TASTO RESTART */
 #restart-btn {
     background-color: #2a1f18;
     color: #f4eae1;
@@ -194,7 +194,7 @@ canvas {
     font-weight: bold;
 }
 
-/* CONTROLLI TOUCH MOBILE */
+/* CONTROLLI TOUCH  */
 .touch-controls {
     display: grid;
     grid-template-columns: repeat(3, 50px);
@@ -247,7 +247,7 @@ canvas {
     grid-row: 2;
 }
 
-/* RIDIMENSIONAMENTO PER DISPOSITIVI MOBILI */
+/* RIDIMENSIONAMENTO */
 @media (max-width: 600px) {
     .game-container {
         padding: 12px;
@@ -278,7 +278,6 @@ canvas {
     }
 }
 
-/* Mostra i controlli touch solo su schermi touch/mobili */
 @media (hover: hover) and (pointer: fine) {
     .touch-controls {
         display: none;
