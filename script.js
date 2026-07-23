@@ -11,14 +11,23 @@ const cellSize = 30; // Dimensione cella in pixel
 canvas.width = cols * cellSize;
 canvas.height = rows * cellSize;
 
-// CARICAMENTO IMMAGINE ARRIVO
+// CARICAMENTO IMMAGINI
 const imgGoal = new Image();
-imgGoal.src = 'arrivo.png'; // Assicurati che arrivo.png sia nella stessa cartella
+imgGoal.src = 'arrivo.png';
 
 let goalLoaded = false;
 imgGoal.onload = () => {
     goalLoaded = true;
-    if (grid.length > 0) draw(); // Ridisegna quando l'immagine è pronta
+    if (grid.length > 0) draw();
+};
+
+const imgPlayer = new Image();
+imgPlayer.src = 'giocatore.webp'; // Caricamento del nuovo sprite del giocatore
+
+let playerLoaded = false;
+imgPlayer.onload = () => {
+    playerLoaded = true;
+    if (grid.length > 0) draw();
 };
 
 let grid = [];
@@ -243,7 +252,6 @@ function draw() {
             cellSize - 4
         );
     } else {
-        // Fallback di riserva se l'immagine sta ancora caricando
         ctx.fillStyle = "#00adb5";
         ctx.fillRect(goal.x * cellSize + 4, goal.y * cellSize + 4, cellSize - 8, cellSize - 8);
     }
@@ -258,11 +266,22 @@ function draw() {
     ctx.arc(enemy.x * cellSize + cellSize / 2, enemy.y * cellSize + cellSize / 2, 3, 0, Math.PI * 2);
     ctx.fill();
 
-    // 5. GIOCATORE (Sfera Gialla)
-    ctx.fillStyle = "#f9ed69";
-    ctx.beginPath();
-    ctx.arc(player.x * cellSize + cellSize / 2, player.y * cellSize + cellSize / 2, cellSize / 3, 0, Math.PI * 2);
-    ctx.fill();
+    // 5. GIOCATORE (Immagine giocatore.webp)
+    if (playerLoaded) {
+        ctx.drawImage(
+            imgPlayer, 
+            player.x * cellSize + 2, 
+            player.y * cellSize + 2, 
+            cellSize - 4, 
+            cellSize - 4
+        );
+    } else {
+        // Fallback temporaneo (Sfera Gialla) se l'immagine sta ancora caricando
+        ctx.fillStyle = "#f9ed69";
+        ctx.beginPath();
+        ctx.arc(player.x * cellSize + cellSize / 2, player.y * cellSize + cellSize / 2, cellSize / 3, 0, Math.PI * 2);
+        ctx.fill();
+    }
 }
 
 /**
