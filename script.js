@@ -182,8 +182,8 @@ function moveEnemy() {
         // ANGOLI RUOTATI DI 90° PER ALLINEARE LA TESTA
         if (nextX > enemy.x) enemyAngle = Math.PI * 0.5;       // Va a Destra
         else if (nextX < enemy.x) enemyAngle = Math.PI * 1.5;  // Va a Sinistra
-        else if (nextY > enemy.y) enemyAngle = 0;              // Va in Basso
-        else if (nextY < enemy.y) enemyAngle = Math.PI;        // Va in Alto
+        else if (nextY > enemy.y) enemyAngle = Math.PI;         // Va in Basso
+        else if (nextY < enemy.y) enemyAngle = 0;       // Va in Alto
 
         enemy.x = nextX;
         enemy.y = nextY;
