@@ -233,22 +233,33 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') movePlayer('LEFT');
 });
 
+ 
+ 
+const overlay = document.getElementById('game-over-overlay');
+const endGameImg = document.getElementById('end-game-img');
+
 // 5. CONTROLLO COLLISIONI E VITTORIA
 function checkCollision() {
     if (player.x === enemy.x && player.y === enemy.y) {
-        endGame("CATTURATO! Il nemico ti ha preso.", "#ff2e63");
+        endGame("CATTURATO! Il nemico ti ha preso.", "#e67e22", "hai perso.webp");
     } else if (player.x === goal.x && player.y === goal.y) {
-        endGame("VITTORIA! Sei fuggito dal labirinto!", "#00adb5");
+        endGame("VITTORIA! Sei fuggito dal labirinto!", "#8fa87a", "hai vinto.webp");
     }
 }
 
-function endGame(message, color) {
+function endGame(message, color, imgSource) {
     gameOver = true;
     statusElement.innerText = message;
     statusElement.style.color = color;
+    
+ 
+    endGameImg.src = imgSource;
+    overlay.classList.remove('hidden');
+
     clearInterval(timerInterval);
     clearInterval(gameLoopInterval);
 }
+
 
 // 6. GRAFICA E DISEGNO
 function draw() {
@@ -371,8 +382,17 @@ function startTimer() {
     }, 1000);
 }
 
-// 8. AVVIO DEL GIOCO
+// 8. AVVIO / RESTART DEL GIOCO
 function init() {
+    
+    overlay.classList.add('hidden');
+    statusElement.innerText = "Arriva all'uscita prima di essere raggiunto!";
+    statusElement.style.color = "#c2d4b2";
+
+    
+    clearInterval(timerInterval);
+    clearInterval(gameLoopInterval);
+
     generateMaze();
     player = { x: 0, y: 0 };
     playerAngle = 0;
