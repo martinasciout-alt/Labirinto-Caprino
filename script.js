@@ -44,7 +44,7 @@ let player = { x: 0, y: 0 };
 let playerAngle = 0; // Rotazione progressiva per "rotolare"
 
 let enemy = { x: cols - 1, y: rows - 1 };
-let enemyAngle = Math.PI * 1.5; // Angolo iniziale (testa verso l'alto)
+let enemyAngle = Math.PI; // Inizializzato per puntare verso l'alto
 
 let goal = { x: cols - 1, y: rows - 1 };
 
@@ -179,11 +179,11 @@ function moveEnemy() {
         let nextX = path[1].x;
         let nextY = path[1].y;
 
-        // ORIENTAMENTO CORRETTO (Invertito di 180° per far puntare la testa in avanti)
-        if (nextX > enemy.x) enemyAngle = 0;                   // Va a Destra -> Testa a Destra
-        else if (nextX < enemy.x) enemyAngle = Math.PI;        // Va a Sinistra -> Testa a Sinistra
-        else if (nextY > enemy.y) enemyAngle = Math.PI * 0.5;  // Va in Basso -> Testa in Basso
-        else if (nextY < enemy.y) enemyAngle = Math.PI * 1.5;  // Va in Alto -> Testa in Alto
+        // ANGOLI RUOTATI DI 90° PER ALLINEARE LA TESTA
+        if (nextX > enemy.x) enemyAngle = Math.PI * 0.5;       // Va a Destra
+        else if (nextX < enemy.x) enemyAngle = Math.PI * 1.5;  // Va a Sinistra
+        else if (nextY > enemy.y) enemyAngle = 0;              // Va in Basso
+        else if (nextY < enemy.y) enemyAngle = Math.PI;        // Va in Alto
 
         enemy.x = nextX;
         enemy.y = nextY;
@@ -377,7 +377,7 @@ function init() {
     player = { x: 0, y: 0 };
     playerAngle = 0;
     enemy = { x: cols - 1, y: rows - 1 };
-    enemyAngle = Math.PI * 1.5;
+    enemyAngle = Math.PI;
     goal = { x: cols - 1, y: rows - 1 };
     gameOver = false;
 
