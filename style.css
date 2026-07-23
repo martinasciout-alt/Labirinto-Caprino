@@ -10,8 +10,8 @@
 }
 
 body {
-    background-color: #12002b; /* SFONDO PAGINA: Viola Scuro */
-    color: #ffffff;
+    background-color: #2b1e16; /* Sfondo pagina: Marrone Legno Scuro */
+    color: #f4eae1;            /* Testo principale: Sabbia/Beige chiaro */
     font-family: 'MatchaCih', sans-serif; 
     display: flex;
     justify-content: center;
@@ -24,57 +24,55 @@ body {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    background: #240046; /* RIQUADRO CONTENITORE: Viola */
+    background: #3d2e24;       /* Box gioco: Marrone caldo */
     padding: 25px;
     border-radius: 16px;
-    border: 3px solid #00f5d4; /* BORDO RIQUADRO: Azzurro Neon */
-    box-shadow: 0 0 20px rgba(0, 245, 212, 0.4);
+    border: 3px solid #8fa87a; /* Bordo: Verde Salvia */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
-/* SCRITTA TITOLO: Giallo Neon */
+/* Titolo */
 h1 {
     margin-bottom: 15px;
-    color: #ffee00;
-    text-shadow: 0 0 8px rgba(255, 238, 0, 0.6);
+    color: #f4eae1;            /* Beige chiaro naturale */
 }
 
-/* SCRITTE HUD: Azzurro Neon */
+/* Informazioni HUD */
 .hud {
     display: flex;
     flex-direction: column; 
     align-items: center;    
     gap: 10px;               
     margin-bottom: 15px;
-    color: #00f5d4;
+    color: #c2d4b2;            /* Verde Salvia Chiaro */
 }
 
-/* BOX TIMER */
+/* Box del Timer */
 #timer-box {
-    background-color: #3c096c;
+    background-color: #2a1f18; /* Sfondo leggermente più scuro */
     padding: 8px 20px;
     border-radius: 20px;
-    border: 2px solid #ffee00; 
+    border: 2px solid #f1c40f; /* Bordo Giallo Miele */
     font-weight: 800;
 }
 
-/* NUMERO DEL TIMER: Giallo Neon */
+/* Numero del Timer */
 #timer {
-    color: #ffee00;
+    color: #f1c40f;            /* Giallo Miele spicco */
     font-size: 1.4rem;
-    text-shadow: 0 0 5px #ffee00;
 }
 
-/* BORDO DEL CANVAS LABIRINTO: Azzurro Neon */
+/* Bordo intorno al Labirinto */
 canvas {
-    border: 4px solid #00f5d4;
+    border: 4px solid #8fa87a; /* Bordo Verde Salvia */
     border-radius: 8px;
-    box-shadow: 0 0 12px rgba(0, 245, 212, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* SCRITTA CONTROLLI: Azzurro Neon */
+/* Testo Controlli */
 .controls-hint {
     margin-top: 15px;
     font-size: 0.95rem;
-    color: #00f5d4;
+    color: #c2d4b2;            /* Verde Salvia Chiaro */
     font-weight: bold;
 }
