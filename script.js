@@ -3,14 +3,19 @@ const ctx = canvas.getContext('2d');
 const timerElement = document.getElementById('timer');
 const statusElement = document.getElementById('status');
 const overlay = document.getElementById('game-over-overlay');
+const startOverlay = document.getElementById('start-overlay');
+const startBtn = document.getElementById('start-btn');
 const endGameImg = document.getElementById('end-game-img');
 
 // CARICAMENTO AUDIO
 const audioVittoria = new Audio('vittoria.wav');
 const audioSconfitta = new Audio('sconfitta.mp3');
+const audioSottofondo = new Audio('sottofondo.wav');
 
 audioVittoria.volume = 0.7;
 audioSconfitta.volume = 0.7;
+audioSottofondo.volume = 0.5;
+audioSottofondo.loop = true; // Loop continuo della musica di sottofondo
 
 // Parametri Griglia
 const rows = 15;
@@ -50,17 +55,17 @@ imgEnemy.onerror = () => console.error("Errore: Impossibile caricare 'nemico.web
 
 let grid = [];
 let player = { x: 0, y: 0 };
-let playerAngle = 0; // Rotazione progressiva
+let playerAngle = 0;
 
 let enemy = { x: cols - 1, y: rows - 1 };
-let enemyAngle = Math.PI; // Puntare verso l'alto
+let enemyAngle = Math.PI;
 
 let goal = { x: cols - 1, y: rows - 1 };
 
 let timeLeft = 80;
 let timerInterval = null;
 let gameLoopInterval = null;
-let gameOver = false;
+let gameOver = true; // Bloccato all'inizio fino al click sul popup
 
 class Cell {
     constructor(r, c) {
@@ -256,7 +261,10 @@ function endGame(message, color, imgSource, isWin) {
     endGameImg.src = imgSource;
     overlay.classList.remove('hidden');
 
-    // Riproduzione Audio
+    // Ferma la musica di sottofondo a fine partita
+    audioSottofondo.pause();
+
+    // Riproduzione Audio Fine Gioco
     if (isWin) {
         audioVittoria.currentTime = 0;
         audioVittoria.play();
@@ -271,7 +279,7 @@ function endGame(message, color, imgSource, isWin) {
 
 // 6. GRAFICA E DISEGNO
 function draw() {
-    // 1. SFONDO
+    // SFONDO
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
             if ((r + c) % 2 === 0) {
@@ -283,7 +291,7 @@ function draw() {
         }
     }
 
-    // 2. MURI
+    // MURI
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
             let x = c * cellSize;
@@ -297,7 +305,7 @@ function draw() {
         }
     }
 
-    // 3. USCITA
+    // USCITA
     if (goalLoaded) {
         ctx.drawImage(imgGoal, goal.x * cellSize + 2, goal.y * cellSize + 2, cellSize - 4, cellSize - 4);
     } else {
@@ -305,7 +313,7 @@ function draw() {
         ctx.fillRect(goal.x * cellSize + 4, goal.y * cellSize + 4, cellSize - 8, cellSize - 8);
     }
 
-    // 4. NEMICO
+    // NEMICO
     let ex = enemy.x * cellSize + cellSize / 2;
     let ey = enemy.y * cellSize + cellSize / 2;
 
@@ -323,7 +331,7 @@ function draw() {
     }
     ctx.restore();
 
-    // 5. GIOCATORE (ROTOLANTE)
+    // GIOCATORE
     let px = player.x * cellSize + cellSize / 2;
     let py = player.y * cellSize + cellSize / 2;
 
@@ -392,7 +400,7 @@ function startTimer() {
 
 // 8. AVVIO / RESTART DEL GIOCO
 function init() {
-    // Interrompi eventuali audio ancora in corso
+    // Interrompi audio di vittoria o sconfitta
     audioVittoria.pause();
     audioVittoria.currentTime = 0;
     audioSconfitta.pause();
@@ -411,14 +419,34 @@ function init() {
     enemy = { x: cols - 1, y: rows - 1 };
     enemyAngle = Math.PI;
     goal = { x: cols - 1, y: rows - 1 };
+    draw();
+
+    // Se la partita è già stata avviata almeno una volta, fai ripartire timer e musica
+    if (startOverlay.classList.contains('hidden')) {
+        gameOver = false;
+        audioSottofondo.currentTime = 0;
+        audioSottofondo.play().catch(() => {});
+        startTimer();
+        gameLoopInterval = setInterval(moveEnemy, 600);
+    }
+}
+
+// Funzione chiamata al click su "Inizia partita" nel popup di avvio
+function startGame() {
+    startOverlay.classList.add('hidden');
     gameOver = false;
+    
+    // Avvia la musica di sottofondo in loop
+    audioSottofondo.currentTime = 0;
+    audioSottofondo.play().catch(e => console.log("Riproduzione audio bloccata dal browser: ", e));
 
     startTimer();
     gameLoopInterval = setInterval(moveEnemy, 600);
-    draw();
 }
 
-// Associa il pulsante di restart
+// Event Listeners
+startBtn.addEventListener('click', startGame);
 document.getElementById('restart-btn').addEventListener('click', init);
 
+// Genera il labirinto iniziale da mostrare dietro al popup
 init();
