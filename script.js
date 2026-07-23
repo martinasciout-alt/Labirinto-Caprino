@@ -15,7 +15,7 @@ const audioSottofondo = new Audio('sottofondo.wav');
 audioVittoria.volume = 0.7;
 audioSconfitta.volume = 0.7;
 audioSottofondo.volume = 0.5;
-audioSottofondo.loop = true; // Loop continuo della musica di sottofondo
+audioSottofondo.loop = true;
 
 // Parametri Griglia
 const rows = 15;
@@ -65,7 +65,7 @@ let goal = { x: cols - 1, y: rows - 1 };
 let timeLeft = 80;
 let timerInterval = null;
 let gameLoopInterval = null;
-let gameOver = true; // Bloccato all'inizio fino al click sul popup
+let gameOver = true;
 
 class Cell {
     constructor(r, c) {
@@ -76,7 +76,7 @@ class Cell {
     }
 }
 
-// 1. FUNZIONI DI SUPPORTO PER IL LABIRINTO
+// 1. FUNZIONI LABIRINTO
 function getUnvisitedNeighbor(cell) {
     let neighbors = [];
     let { r, c } = cell;
@@ -243,6 +243,26 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') movePlayer('DOWN');
     if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') movePlayer('LEFT');
 });
+
+// CONTROLLI TOUCH DIREZIONALI
+function addTouchControls() {
+    const bindBtn = (id, dir) => {
+        const btn = document.getElementById(id);
+        if (!btn) return;
+        const handleTouch = (e) => {
+            e.preventDefault();
+            movePlayer(dir);
+        };
+        btn.addEventListener('touchstart', handleTouch, { passive: false });
+        btn.addEventListener('click', handleTouch);
+    };
+
+    bindBtn('btn-up', 'UP');
+    bindBtn('btn-right', 'RIGHT');
+    bindBtn('btn-down', 'DOWN');
+    bindBtn('btn-left', 'LEFT');
+}
+addTouchControls();
 
 // 5. CONTROLLO COLLISIONI E VITTORIA
 function checkCollision() {
@@ -421,7 +441,6 @@ function init() {
     goal = { x: cols - 1, y: rows - 1 };
     draw();
 
-    // Se la partita è già stata avviata almeno una volta, fai ripartire timer e musica
     if (startOverlay.classList.contains('hidden')) {
         gameOver = false;
         audioSottofondo.currentTime = 0;
