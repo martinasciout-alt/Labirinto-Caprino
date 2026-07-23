@@ -103,7 +103,7 @@ function removeWalls(a, b) {
     else if (y === -1) { a.walls[2] = false; b.walls[0] = false; }
 }
 
-// 2. GENERAZIONE
+// 2. lab. comp.
 function generateMaze() {
     grid = [];
     for (let r = 0; r < rows; r++) {
@@ -281,10 +281,8 @@ function endGame(message, color, imgSource, isWin) {
     endGameImg.src = imgSource;
     overlay.classList.remove('hidden');
 
-    // Ferma la musica di sottofondo a fine partita
     audioSottofondo.pause();
 
-    // Riproduzione Audio Fine Gioco
     if (isWin) {
         audioVittoria.currentTime = 0;
         audioVittoria.play();
