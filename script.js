@@ -175,17 +175,19 @@ function moveEnemy() {
 
     let path = getPathToPlayer();
 
-    // Se esiste un percorso verso il giocatore (almeno la casella adiacente path[1])
+    // path[0] è dove si trova ora il nemico.
+    // path[1] è la casella successiva (anche se coincide con la posizione del giocatore).
     if (path.length > 1 && path[1]) {
         let nextX = path[1].x;
         let nextY = path[1].y;
 
-        // Calcola l'angolo orientato correttamente (invertito di 180° per mettere i piedi in basso)
-        if (nextX > enemy.x) enemyAngle = Math.PI;             // Invece di 0° -> 180°
-        else if (nextX < enemy.x) enemyAngle = 0;              // Invece di 180° -> 0°
-        else if (nextY > enemy.y) enemyAngle = Math.PI * 1.5;  // Invece di 90° -> 270°
-        else if (nextY < enemy.y) enemyAngle = Math.PI * 0.5;  // Invece di 270° -> 90°
+        // Calcola l'angolo orientato con i piedi in basso
+        if (nextX > enemy.x) enemyAngle = Math.PI;             // Destra
+        else if (nextX < enemy.x) enemyAngle = 0;              // Sinistra
+        else if (nextY > enemy.y) enemyAngle = Math.PI * 1.5;  // Basso
+        else if (nextY < enemy.y) enemyAngle = Math.PI * 0.5;  // Alto
 
+        // Muovi il nemico esattamente sulla casella successiva
         enemy.x = nextX;
         enemy.y = nextY;
     }
