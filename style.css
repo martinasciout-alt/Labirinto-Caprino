@@ -1,39 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;800&display=swap');
-
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #1b1b1b;
-    color: white;
+/* 1. CARICAMENTO DEL TUO FONT LOCALE */
+@font-face {
+    font-family: 'MatchaCih';
+    src: url('Matcha Cih.otf') format('opentype'); 
+    /* NOTA: Se nella cartella hai il file .ttf invece di .otf, 
+       cambia l'estensione sopra in 'Matcha Cih.ttf' e 'truetype' */
 }
 
-.game-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.hud {
-    display: flex;
-    flex-direction: column;
-    align-items: center;    
-    gap: 8px;               
-    margin-bottom: 15px;
-}
-
-#timer-box {
-    background-color: #232931;
-    padding: 6px 16px;
-    border-radius: 20px;
-    border: 2px solid #4ecca3;
-    font-weight: 800;
-}
-
-#timer {
-    color: #ff2e63;
-}
-
-
+/* 2. RESET E IMPOSTAZIONI DI BASE */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -43,7 +16,8 @@ body {
 body {
     background-color: #1a1a2e;
     color: #ffffff;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Applicazione del tuo font personalizzato a tutto il gioco */
+    font-family: 'MatchaCih', sans-serif; 
     display: flex;
     justify-content: center;
     align-items: center;
@@ -51,6 +25,9 @@ body {
 }
 
 .game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
     background: #16213e;
     padding: 20px;
@@ -63,12 +40,21 @@ h1 {
     color: #e94560;
 }
 
+/* 3. LAYOUT DELL'HUD (Frase sopra, Tempo sotto al centro) */
 .hud {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column; 
+    align-items: center;    
+    gap: 8px;               
     margin-bottom: 15px;
-    font-size: 1.1rem;
-    font-weight: bold;
+}
+
+#timer-box {
+    background-color: #232931;
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 2px solid #4ecca3;
+    font-weight: 800;
 }
 
 #timer {
